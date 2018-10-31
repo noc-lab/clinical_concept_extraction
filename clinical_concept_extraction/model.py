@@ -67,3 +67,31 @@ def bidirectional_lstm_func_freeze(x, l):
     rnn_output = tf.concat(rnn_layer, axis=-1)
 
     return rnn_output
+
+
+def annotation_ensemble(x, l, scope='clinical_concept_extraction'):
+    with tf.variable_scope(scope):
+        l = tf.cast(l, tf.int32)
+        all_prediction = []
+
+        for model_id in range(10):
+            with tf.variable_scope('copy_' + str(model_id)):
+                weight = tf.get_variable('weight', [3, 1], tf.float32, tf.constant_initializer(1))
+                n_weight = tf.nn.softmax(weight, axis=0)
+                gamma = tf.get_variable('gamma', [], tf.float32, tf.constant_initializer(1))
+                token_embedding = tf.tensordot(x, n_weight, [[-1], [0]])
+                token_embedding = gamma * tf.squeeze(token_embedding, axis=-1)
+
+                lstm_output = bidirectional_lstm_func_freeze(token_embedding, l)
+
+                logits = tf.layers.dense(lstm_output, 7, activation=None)
+
+                transition = tf.get_variable('transitions', shape=[7, 7], dtype=tf.float32)
+
+                viterbi_sequence, viterbi_score = tf.contrib.crf.crf_decode(logits, transition, l)
+                prediction = tf.cast(viterbi_sequence, tf.int32)
+                all_prediction.append(prediction)
+
+        all_prediction = tf.stack(all_prediction, axis=-1)
+
+        return all_prediction,
