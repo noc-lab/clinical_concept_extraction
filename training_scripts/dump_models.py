@@ -8,14 +8,6 @@ flags.DEFINE_string('save_model_dir',
                     '../ckpt/bilstm_crf_concept/model_0/',
                     'path to the directory for saving the model')
 
-flags.DEFINE_string('tfrecord_dir',
-                    '../data/preprocessed/tfrecords/',
-                    'path to the directory for tfrecords')
-
-flags.DEFINE_string('eval_dir',
-                    '../evaluate/pkl/',
-                    'path to the directory for evaluation')
-
 flags.DEFINE_integer('random_seed', 0, 'random seed for training')
 
 
