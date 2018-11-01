@@ -57,7 +57,7 @@ take a large space in the hard drive but can save time in the training.
 
 To train the NER models starting with 10 different random seeds, run
 ```bash
-for i in {1..9}
+for i in {0..9}
 do
     python training.py --train=True --random_seed=${i} --save_model_dir=../ckpt/bilstm_crf_concept/model_${i}/
 done
@@ -67,7 +67,7 @@ done
 
 After obtaining 10 models using the training scripts, run
 ```bash
-for i in {1..9}
+for i in {0..9}
 do
     python training.py --train=False --random_seed=${i} --save_model_dir=../ckpt/bilstm_crf_concept/model_${i}/
 done
