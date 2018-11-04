@@ -12,7 +12,7 @@ pip install git+https://github.com/noc-lab/clinical_concept_extraction.git
 ```
 
 Next, set up the environments for running the codes. Create a folder, say 
-`cce_assets`, and set an environment variables `CCE_ASSETS` to be the path of the folder. Download the pretrained ELMo model [here](https://github.com/noc-lab/clinical_concept_extraction/releases/download/latest/elmo.tar.gz)
+`cce_assets`, and set an environment variable `CCE_ASSETS` to the path of the folder. Download the pretrained ELMo model [here](https://github.com/noc-lab/clinical_concept_extraction/releases/download/latest/elmo.tar.gz)
 and unzip files to the folder. The files should be structured as follows:
 ```text
 cce_assets
