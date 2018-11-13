@@ -4,9 +4,8 @@ This repository contains codes and models clinical concept extraction described 
 
 ## Install package
 
-The package is tested in Python 3.6. To begin with, install `tensorflow` according to [this instruction](https://www.tensorflow.org/install/) and the bilm packages and our package by
+The package is tested in Python 3.6. To begin with, install `tensorflow` according to [this instruction](https://www.tensorflow.org/install/) and
 ```bash
-pip install git+https://github.com/allenai/bilm-tf.git
 pip install git+https://github.com/noc-lab/clinical_concept_extraction.git
 ```
 
