@@ -25,7 +25,7 @@ cce_assets
 
 ## Usages
 
-An example of how to use the package provides is shown [here](https://nbviewer.jupyter.org/github/noc-lab/clinical_concept_extraction/blob/master/examples/fancy_example.ipynb)
+An example of how to use the package is shown [here](https://nbviewer.jupyter.org/github/noc-lab/clinical_concept_extraction/blob/master/example.ipynb)
 
 ## Citation
 
