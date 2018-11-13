@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from bilm import Batcher, BidirectionalLanguageModel
+from clinical_concept_extraction.bilm import Batcher, BidirectionalLanguageModel
 import os
 
 class ELMO_MIMIC:

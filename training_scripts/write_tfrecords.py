@@ -5,6 +5,7 @@ from sklearn.model_selection import KFold
 from tqdm import tqdm
 
 from clinical_concept_extraction.elmo_vector import ELMO_MIMIC
+from html import unescape
 
 
 def clean_text(t, c):
@@ -16,7 +17,7 @@ def clean_text(t, c):
 
     for t_, c_ in zip(t, c):
         if len(t_) > 0:
-            new_t.append(t_)
+            new_t.append(unescape(t_))
             new_c.append(c_)
 
     return new_t, new_c

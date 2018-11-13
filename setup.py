@@ -9,7 +9,7 @@ except ImportError:  # There is no one, declare dependency
 
 setup(
     name='clinical_concept_extraction',
-    version='0.1.0',
+    version='0.1.1',
     author="Henghui Zhu",
     url='https://github.com/noc-lab/clinical_concept_extraction',
     author_email="henghuiz@bu.edu",
