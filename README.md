@@ -9,7 +9,7 @@ The package is tested in Python 3.6. To begin with, install `tensorflow` accordi
 pip install git+https://github.com/noc-lab/clinical_concept_extraction.git
 ```
 
-Next, create a folder, say  `cce_assets`, and set an environment variable `CCE_ASSETS` to the path of the folder. Download the pretrained ELMo model [here](https://github.com/noc-lab/clinical_concept_extraction/releases/download/latest/elmo.tar.gz) and unzip files to the folder. Currently, we don't provide the pretrained LSTM model due to i2b2 license. But you can either train a model according to the [instruction](https://github.com/noc-lab/clinical_concept_extraction/blob/master/training_scripts/README.md) or send us an email to henghuiz@bu.edu with a proof that you can access to the [i2b2 NLP data sets](https://www.i2b2.org/NLP/DataSets/Main.php). (We are currently working on building a model from silver data which will be released soon.) The files should be structured as follows:
+Next, create a folder, say `cce_assets`, and set an environment variable `CCE_ASSETS` to the path of the folder. Download the pretrained ELMo model [here](https://github.com/noc-lab/clinical_concept_extraction/releases/download/latest/elmo.tar.gz) and unzip files to the folder. Currently, we don't provide the pretrained LSTM model using I2B2 data due to i2b2 license. But we provide a silver model [here](https://github.com/noc-lab/clinical_concept_extraction/releases/download/latest/blstm.tar.gz). We use the gold model trained using all training and test data in 2010 i2b2/VA shared task to generate silver annotations for 2000 discharge summaries in MIMIC-III. Then we fit the these data and get the silver model. Finally, the files should be structured as follows:
 ```text
 cce_assets
 ├── blstm
