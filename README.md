@@ -1,5 +1,7 @@
 # Clinical Concept Extraction with Contextual Word Embedding
 
+[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
+
 This repository contains codes and models clinical concept extraction described in our paper [https://arxiv.org/abs/1810.10566](https://arxiv.org/abs/1810.10566). It is designed for a clinical concept extraction task such as the 2010 i2b2/VA shared task.
 
 ## Install package
