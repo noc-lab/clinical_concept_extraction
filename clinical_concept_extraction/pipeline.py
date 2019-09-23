@@ -39,7 +39,7 @@ def get_annotation(all_sentences, batch_size=2):
 
     tf.reset_default_graph()
     with tf.Graph().as_default():
-        dataset = tf.data.Dataset().from_generator(
+        dataset = tf.data.Dataset.from_generator(
             build_generator(x, l),
             (tf.float32, tf.int64),
             (tf.TensorShape([None, 1024, 3]), tf.TensorShape([]))
