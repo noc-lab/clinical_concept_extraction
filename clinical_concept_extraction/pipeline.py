@@ -12,13 +12,18 @@ os.environ['CCE_ASSETS'] = '/home/omar/Desktop/kamil_clinic/cce_assets'
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
+# build both emlo and clinical_concept extraction globally so no need to build them with each time prediction needed
+# save some time and speed up prediction process.
 elmo_model = ELMO_MIMIC()
 tf.reset_default_graph()
 y, x_placeHolder, l_placeHolder, clinical_session = build_clinical_graph(session=tf.Session(config=config))
 
 
-
 def decode_prediction(all_y, l):
+    '''
+    map prediction output to all concepts
+    ['O', 'I-problem', 'I-treatment', 'I-test', 'B-problem', 'B-treatment', 'B-test']
+    '''
     all_y_ens = []
     for i in range(len(l)):
         best_v, _ = mode(all_y[i][:l[i]], axis=1)
@@ -30,17 +35,26 @@ def decode_prediction(all_y, l):
 
 
 def predict_concepts_labels(tokenized_sentences):
+    '''
+    get embeddings for batch tokenized sentences and feed them to the clinical concept extraction model.
+    '''
     embedds, embedds_lengths = elmo_model.get_embeddings(tokenized_sentences)
     all_y = [clinical_session.run([y], feed_dict={x_placeHolder:embedds,l_placeHolder:embedds_lengths})[0][0]]
     prediction = decode_prediction(np.squeeze(all_y, axis=0), embedds_lengths)
     return prediction
 
 def extract_concepts(Note, batch_size=1):
-    start_time = time.time()
+    '''
+    High level function to extract clinical concept from given clinical note
+    '''
+    start_time = time.time() # calculate prediction time
     global elmo_model, clinical_session
     concepts = []
+    # use simple_sentence_segment to segement note into sentence and tokenize them.
     tokenized_sentences, all_spans, normalized_text = parse_text(Note)
     
+    # claculate number of batches and extract concepts for each batch.
+
     if(batch_size> len(tokenized_sentences)):
         batch_size = len(tokenized_sentences)
 
@@ -65,49 +79,15 @@ def extract_concepts(Note, batch_size=1):
                 concepts.append([token, annotation])
 
     
-    
+    # print prediction time
     print("\n\nTook ", time.time()-start_time, " Seconds to predict\n\n")
 
 
-
+    # return each token/word in note and predicted label/concept
+    # as an array like [[word_0, annotation_0], [word_1, annotation_1], ....., [word_n, annotation_n]]
     return concepts
 
 
-
-
-
-
-# def build_inputs(all_sentences):
-#     all_x = []
-#     all_l = []
-
-#     # elmo_models = ELMO_MIMIC()
-
-#     for sentence in all_sentences:
-#         embeddings = elmo_models.get_embeddings(sentence)
-#         all_x.append(embeddings)
-#         all_l.append(len(embeddings))
-
-
-#     batch_size = len(all_l)
-#     dataset = tf.data.Dataset.from_generator(lambda: zip(all_x, all_l), (tf.float32, tf.int64),(tf.TensorShape([None, 1024, 3]), tf.TensorShape([])))
-#     dataset = dataset.padded_batch(batch_size, ([tf.Dimension(None), tf.Dimension(1024), tf.Dimension(3)], []))
-#     iterator = dataset.make_one_shot_iterator()
-#     next_element = iterator.get_next()
-    
-#     with tf.Session() as sess:
-#         input_data=sess.run(next_element)
-
-#     x_inp, l_inp = input_data
-
-#     return x_inp, l_inp, all_l
-
-# def build_generator(x, l):
-#     def generator():
-#         for x_, l_ in zip(x, l):
-#             yield x_, l_
-
-#     return generator
 
 
 

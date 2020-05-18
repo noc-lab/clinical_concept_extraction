@@ -49,7 +49,7 @@ def bidirectional_rnn_func(x, l, train=True):
     return rnn_output
 
 
-def bidirectional_lstm_func_freeze(x, l, i):
+def bidirectional_lstm_func_freeze(x, l):
 
     all_fw_cells = []
     all_bw_cells = []
@@ -85,7 +85,7 @@ def annotation_ensemble(x,l, scope='clinical_concept_extraction'):
                 token_embedding = tf.tensordot(x, n_weight, [[-1], [0]])
                 token_embedding = gamma * tf.squeeze(token_embedding, axis=-1)
 
-                lstm_output = bidirectional_lstm_func_freeze(token_embedding, l, model_id)
+                lstm_output = bidirectional_lstm_func_freeze(token_embedding, l)
 
                 logits = tf.layers.dense(lstm_output, 7, activation=None)
 
@@ -111,8 +111,8 @@ def build_clinical_graph(session,  batch_size=1):
 
     
 
-    x_ = tf.placeholder(tf.float32, [None ,None, 1024, 3],"x_")
-    l_ = tf.placeholder(tf.int64, [None,],"l_")
+    x_ = tf.placeholder(tf.float32, [None ,None, 1024, 3],"x_") # batch embeedings of shape [batch_size, max sentence length, 1024, 3]
+    l_ = tf.placeholder(tf.int64, [None,],"l_") # batch embeddings length = [max sentence length for sentence in batch of sentence]
     y = annotation_ensemble(x_, l_)
     saver = tf.train.Saver()
     saver.restore(session, os.path.join(model_path, 'model'))

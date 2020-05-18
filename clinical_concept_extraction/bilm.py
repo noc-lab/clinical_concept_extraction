@@ -59,9 +59,6 @@ class Vocabulary(object):
     def bos(self):
         return self._bos
 
-    @property
-    def vocab(self):
-        return self._id_to_word
         
     @property
     def eos(self):
@@ -236,6 +233,7 @@ class Batcher(object):
         [['The', 'first', 'sentence', '.'], ['Second', '.']]
         '''
         n_sentences = len(sentences)
+        # add +2 for the start and end char appended to each sentence
         max_length = max(len(sentence) for sentence in sentences) + 2
 
         X_char_ids = np.zeros(

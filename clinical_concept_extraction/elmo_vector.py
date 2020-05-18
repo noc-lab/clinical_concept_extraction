@@ -2,7 +2,6 @@ import numpy as np
 import tensorflow as tf
 from clinical_concept_extraction.bilm import Batcher, BidirectionalLanguageModel
 import os
-from tqdm import tqdm
 
 class ELMO_MIMIC:
     def __init__(self):
@@ -24,30 +23,19 @@ class ELMO_MIMIC:
 
         self.session = tf.Session(config=config)
         self.session.run(tf.global_variables_initializer())
-
-        # self.vocab_embeddings()
-
+        
 
 
+    # get all sentences embeddings as a batch instead of getting each sentence embeddings alone
     def get_embeddings(self, all_sentences):
+        # convert each sentence into list of chars ids.
+        # applying padding for the whole batch of sentence by the max sentence length.
         sentences_ids, lengths_list = self.batcher.batch_sentences(all_sentences)
         embedding = tf.transpose(self.output['lm_embeddings'], perm=[0, 2, 3, 1])
+        # embeddings shape = [batch_size, max sentence length, 1024, 3]
         embedding = self.session.run(embedding, feed_dict={self.input: sentences_ids})
-
         return embedding, lengths_list
 
-    def vocab_embeddings(self):
-        self.vocab_vocab_embeddings_list = []
-        print("\n\n\n\n===========================================================")
-        print("Vocab length = ",len(self.batcher.words_vocab))
-        for word in tqdm(self.batcher.words_vocab):
-            # print(i, " word > ", word)
-            self.vocab_vocab_embeddings_list.append(self.get_embeddings(word))
-
-
-    @property
-    def get_vocab_embeddings(self):
-        return self.vocab_vocab_embeddings_list
 
     def close_session(self):
         self.session.close()
