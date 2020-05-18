@@ -12,6 +12,7 @@ flags.DEFINE_integer('hidden_state', 256, 'Number of hidden state')
 flags.DEFINE_integer('depth', 2, 'Depth of rnn models')
 
 
+
 def bidirectional_rnn_func(x, l, train=True):
     rnn_type = FLAGS.rnn_cell_type
     if rnn_type.lower() == 'lstm':
@@ -48,7 +49,8 @@ def bidirectional_rnn_func(x, l, train=True):
     return rnn_output
 
 
-def bidirectional_lstm_func_freeze(x, l):
+def bidirectional_lstm_func_freeze(x, l, i):
+
     all_fw_cells = []
     all_bw_cells = []
     for _ in range(2):
@@ -61,6 +63,7 @@ def bidirectional_lstm_func_freeze(x, l):
     rnn_fw_cells = tf.nn.rnn_cell.MultiRNNCell(all_fw_cells)
     rnn_bw_cells = tf.nn.rnn_cell.MultiRNNCell(all_bw_cells)
 
+
     rnn_layer, _ = tf.nn.bidirectional_dynamic_rnn(
         rnn_fw_cells, rnn_bw_cells, x, sequence_length=l, dtype=tf.float32)
 
@@ -69,7 +72,7 @@ def bidirectional_lstm_func_freeze(x, l):
     return rnn_output
 
 
-def annotation_ensemble(x, l, scope='clinical_concept_extraction'):
+def annotation_ensemble(x,l, scope='clinical_concept_extraction'):
     with tf.variable_scope(scope):
         l = tf.cast(l, tf.int32)
         all_prediction = []
@@ -82,7 +85,7 @@ def annotation_ensemble(x, l, scope='clinical_concept_extraction'):
                 token_embedding = tf.tensordot(x, n_weight, [[-1], [0]])
                 token_embedding = gamma * tf.squeeze(token_embedding, axis=-1)
 
-                lstm_output = bidirectional_lstm_func_freeze(token_embedding, l)
+                lstm_output = bidirectional_lstm_func_freeze(token_embedding, l, model_id)
 
                 logits = tf.layers.dense(lstm_output, 7, activation=None)
 
@@ -95,3 +98,25 @@ def annotation_ensemble(x, l, scope='clinical_concept_extraction'):
         all_prediction = tf.stack(all_prediction, axis=-1)
 
         return all_prediction,
+
+
+
+
+
+def build_clinical_graph(session,  batch_size=1):
+    
+    model_path = os.path.join(os.environ['CCE_ASSETS'], 'blstm')
+    if not os.path.isdir(model_path):
+        raise FileNotFoundError
+
+    
+
+    x_ = tf.placeholder(tf.float32, [None ,None, 1024, 3],"x_")
+    l_ = tf.placeholder(tf.int64, [None,],"l_")
+    y = annotation_ensemble(x_, l_)
+    saver = tf.train.Saver()
+    saver.restore(session, os.path.join(model_path, 'model'))
+
+                
+
+    return y, x_,l_, session

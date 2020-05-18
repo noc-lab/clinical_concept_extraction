@@ -60,6 +60,10 @@ class Vocabulary(object):
         return self._bos
 
     @property
+    def vocab(self):
+        return self._id_to_word
+        
+    @property
     def eos(self):
         return self._eos
 
@@ -166,6 +170,10 @@ class UnicodeCharsVocabulary(Vocabulary):
     def max_word_length(self):
         return self._max_word_length
 
+    @property
+    def vocab(self):
+        return self._id_to_word
+
     def _convert_word_to_char_ids(self, word):
         code = np.zeros([self.max_word_length], dtype=np.int32)
         code[:] = self.pad_char
@@ -216,6 +224,11 @@ class Batcher(object):
         )
         self._max_token_length = max_token_length
 
+
+    @property
+    def words_vocab(self):
+        return self._lm_vocab.vocab
+
     def batch_sentences(self, sentences: List[List[str]]):
         '''
         Batch the sentences as character ids
@@ -230,14 +243,16 @@ class Batcher(object):
             dtype=np.int64
         )
 
+        lengths_list = []
         for k, sent in enumerate(sentences):
+            lengths_list.append(max_length-2)
             length = len(sent) + 2
             char_ids_without_mask = self._lm_vocab.encode_chars(
                 sent, split=False)
             # add one so that 0 is the mask value
             X_char_ids[k, :length, :] = char_ids_without_mask + 1
 
-        return X_char_ids
+        return X_char_ids, lengths_list
 
 
 class TokenBatcher(object):
