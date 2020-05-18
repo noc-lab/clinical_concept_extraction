@@ -43,19 +43,17 @@ def predict_concepts_labels(tokenized_sentences):
     prediction = decode_prediction(np.squeeze(all_y, axis=0), embedds_lengths)
     return prediction
 
-def extract_concepts(Note, batch_size=1):
+def extract_concepts(Note, batch_size=1, as_one_batch=False):
     '''
-    High level function to extract clinical concept from given clinical note
+    note: sample text
+    as_one_batch : boolen to indicate if desired to predict the whole text as one batch
     '''
-    start_time = time.time() # calculate prediction time
+    start_time = time.time()
     global elmo_model, clinical_session
     concepts = []
-    # use simple_sentence_segment to segement note into sentence and tokenize them.
     tokenized_sentences, all_spans, normalized_text = parse_text(Note)
     
-    # claculate number of batches and extract concepts for each batch.
-
-    if(batch_size> len(tokenized_sentences)):
+    if(batch_size> len(tokenized_sentences)) or as_one_batch:
         batch_size = len(tokenized_sentences)
 
     number_of_batches = int(len(tokenized_sentences)/batch_size)
@@ -65,28 +63,31 @@ def extract_concepts(Note, batch_size=1):
 
     for batch_number in range(number_of_batches):
         batch_sentences_tokens = tokenized_sentences[batch_number*batch_size:(batch_number*batch_size)+batch_size]
+        
+        batch_spans = all_spans[batch_number*batch_size:(batch_number*batch_size)+batch_size]
+
         predictions=predict_concepts_labels(batch_sentences_tokens)
-        for sent_, ann_ in zip(batch_sentences_tokens, predictions):
-            for token, annotation in zip(sent_, ann_):
-                concepts.append([token, annotation])
+                
+        for sent_tokens, sent_spans, sent_ann in zip(batch_sentences_tokens, batch_spans, predictions):
+            for token, span, annotation in zip(sent_tokens, sent_spans, sent_ann):
+                concepts.append([token,span, annotation])
 
     # predict remaining last batch
     if remaining_batchs > 0:
         remaining_last_batch = tokenized_sentences[number_of_batches*batch_size:]
+        remaining_last_spans = all_spans[number_of_batches*batch_size:]
         predictions = predict_concepts_labels(remaining_last_batch)
-        for sent_, ann_ in zip(remaining_last_batch, predictions):
-            for token, annotation in zip(sent_, ann_):
-                concepts.append([token, annotation])
+        for sent_tokens, sent_spans, sent_ann in zip(remaining_last_batch, remaining_last_spans, predictions):
+            for token, span, annotation in zip(sent_tokens, sent_spans, sent_ann):
+                concepts.append([token,span, annotation])
 
     
-    # print prediction time
+    
     print("\n\nTook ", time.time()-start_time, " Seconds to predict\n\n")
 
 
-    # return each token/word in note and predicted label/concept
-    # as an array like [[word_0, annotation_0], [word_1, annotation_1], ....., [word_n, annotation_n]]
+    # concept is an list of [[token_0, span_0, label_0], [token_1, span_1, label_1], ..., ...., [token_n, span_n, label_n]]
     return concepts
-
 
 
 
