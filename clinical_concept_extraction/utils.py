@@ -52,14 +52,12 @@ def get_ents (listOfdic_entities , text):
 
 def build_display_elements(annotations):
     display_entities = []
-    text = ''
     for i, annotation in enumerate(annotations):
         token, span, label = annotation
-        text += token+' '
         if label !='O':
             new_ent = {}
             new_ent['start'] = span[0]
             new_ent['end'] = span[1]+1
             new_ent['label'] = label[2:]
             display_entities.append(new_ent)
-    return display_entities, text
+    return display_entities
