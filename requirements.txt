@@ -1,2 +1,6 @@
 scipy
 numpy
+nltk
+spacy
+scikit-learn
+tensorflow
