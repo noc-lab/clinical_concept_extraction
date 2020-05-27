@@ -14,15 +14,15 @@ class ELMO_MIMIC:
         weight_file = os.path.join(base_path,'mimic_wiki.hdf5')
 
         self.batcher = Batcher(vocab_file, 50)
-        self.input = tf.placeholder('int32', shape=(None, None, 50))
+        self.input = tf.compat.v1.placeholder('int32', shape=(None, None, 50))
         self.model = BidirectionalLanguageModel(options_file, weight_file)
         self.output = self.model(self.input)
 
-        config = tf.ConfigProto()
+        config = tf.compat.v1.ConfigProto()
         config.gpu_options.allow_growth = True
 
-        self.session = tf.Session(config=config)
-        self.session.run(tf.global_variables_initializer())
+        self.session = tf.compat.v1.Session(config=config)
+        self.session.run(tf.compat.v1.global_variables_initializer())
         
 
 

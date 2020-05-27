@@ -8,7 +8,7 @@ import numpy as np
 from clinical_concept_extraction.utils import parse_text
 import time
 
-config = tf.ConfigProto()
+config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
 
 class ClinicalConceptExtraction:
@@ -22,8 +22,8 @@ class ClinicalConceptExtraction:
         # build both emlo and clinical_concept extraction globally so no need to build them with each time prediction needed
         # save some time and speed up prediction process.
         self.elmo_model = ELMO_MIMIC()
-        tf.reset_default_graph()
-        self.y, self.x_placeHolder, self.l_placeHolder, self.clinical_session = build_clinical_graph(session=tf.Session(config=config))
+        tf.compat.v1.reset_default_graph()
+        self.y, self.x_placeHolder, self.l_placeHolder, self.clinical_session = build_clinical_graph(session=tf.compat.v1.Session(config=config))
 
 
     def decode_prediction(self, all_y, l):
