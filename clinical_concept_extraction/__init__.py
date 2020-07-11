@@ -1,1 +1,1 @@
-from .pipeline import get_annotation as clinical_concept_extraction
+from .pipeline import ClinicalConceptExtraction as ClinicalConceptExtraction

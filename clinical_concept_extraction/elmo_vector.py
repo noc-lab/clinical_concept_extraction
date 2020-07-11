@@ -14,22 +14,28 @@ class ELMO_MIMIC:
         weight_file = os.path.join(base_path,'mimic_wiki.hdf5')
 
         self.batcher = Batcher(vocab_file, 50)
-        self.input = tf.placeholder('int32', shape=(None, None, 50))
+        self.input = tf.compat.v1.placeholder('int32', shape=(None, None, 50))
         self.model = BidirectionalLanguageModel(options_file, weight_file)
         self.output = self.model(self.input)
 
-        config = tf.ConfigProto()
+        config = tf.compat.v1.ConfigProto()
         config.gpu_options.allow_growth = True
 
-        self.session = tf.Session(config=config)
-        self.session.run(tf.global_variables_initializer())
+        self.session = tf.compat.v1.Session(config=config)
+        self.session.run(tf.compat.v1.global_variables_initializer())
+        
 
-    def get_embeddings(self, sentence):
-        sentence_ids = self.batcher.batch_sentences([sentence])
-        embedding = self.session.run(self.output['lm_embeddings'], feed_dict={self.input: sentence_ids})
-        embedding = np.transpose(embedding[0], [1, 2, 0])
 
-        return embedding
+    # get all sentences embeddings as a batch instead of getting each sentence embeddings alone
+    def get_embeddings(self, all_sentences):
+        # convert each sentence into list of chars ids.
+        # applying padding for the whole batch of sentence by the max sentence length.
+        sentences_ids, lengths_list = self.batcher.batch_sentences(all_sentences)
+        embedding = tf.transpose(self.output['lm_embeddings'], perm=[0, 2, 3, 1])
+        # embeddings shape = [batch_size, max sentence length, 1024, 3]
+        embedding = self.session.run(embedding, feed_dict={self.input: sentences_ids})
+        return embedding, lengths_list
+
 
     def close_session(self):
         self.session.close()
